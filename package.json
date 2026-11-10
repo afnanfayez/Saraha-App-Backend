@@ -1,41 +1,20 @@
 {
-  "name": "saraha-app-backend",
+  "name": "saraha_app",
   "version": "1.0.0",
-  "private": true,
+  "description": "Saraha App Backend API",
   "type": "module",
-  "description": "Saraha anonymous messaging backend for academic coursework",
-  "engines": {
-    "node": ">=20.19.0"
-  },
+  "main": "src/main.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "test": "node --test",
-    "test:watch": "node --test --watch",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "check": "npm run lint && npm run format:check && npm test"
+    "start:dev": "cross-env NODE_ENV=development node --watch src/main.js",
+    "start:prod": "cross-env NODE_ENV=production node src/main.js"
   },
   "dependencies": {
-    "argon2": "0.45.2",
-    "cors": "2.8.6",
-    "dotenv": "18.0.9",
-    "express": "5.3.0",
-    "express-rate-limit": "8.7.3",
-    "formidable": "3.5.4",
-    "helmet": "8.3.0",
-    "jsonwebtoken": "9.0.3",
-    "mongoose": "9.12.0",
-    "zod": "4.6.7"
-  },
-  "devDependencies": {
-    "eslint": "10.14.0",
-    "nodemon": "3.1.14",
-    "prettier": "3.9.10",
-    "supertest": "7.3.2"
-  },
-  "allowScripts": {
-    "argon2@0.45.2": true
+    "argon2": "latest",
+    "bcrypt": "latest",
+    "cross-env": "latest",
+    "dotenv": "latest",
+    "express": "^5",
+    "jsonwebtoken": "latest",
+    "mongoose": "latest"
   }
 }
