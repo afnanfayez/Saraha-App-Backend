@@ -1,7 +1,10 @@
-import { userModel } from '../../database/models/index.js'
+import { OAuth2Client } from 'google-auth-library'
+import userRepo from '../../database/repo/user.repo.js'
+import { providerEnum } from '../../common/enums/provider.enum.js'
 import {
   conflictException,
-  notFoundException
+  notFoundException,
+  unauthorizedException
 } from '../../common/utils/exceptions.js'
 import {
   createLoginTokens,
@@ -9,25 +12,29 @@ import {
   myCompare,
   myHash
 } from '../../common/security/index.js'
-import { ACCESS_EXPIRATION } from '../../config/config.service.js'
+import {
+  ACCESS_EXPIRATION,
+  GOOGLE_CLIENT_ID
+} from '../../config/config.service.js'
+
+const googleClient = new OAuth2Client()
 
 export const signup = async (data) => {
-  const checkUser = await userModel.findOne({ email: data.email })
+  const checkUser = await userRepo.findOne({ filter: { email: data.email } })
 
   if (checkUser) {
     conflictException('User already exists')
   }
 
-  data.password = await myHash({ plainText: data.password })
-  data.phone = encryption(data.phone)
+  const { confirmPassword, ...userData } = data
+  userData.password = await myHash({ plainText: data.password })
+  userData.phone = encryption(data.phone)
 
-  const user = await userModel.create(data)
-
-  return user
+  return await userRepo.create({ data: userData })
 }
 
 export const login = async (data) => {
-  const user = await userModel.findOne({ email: data.email })
+  const user = await userRepo.findOne({ filter: { email: data.email } })
 
   if (!user) {
     notFoundException('User not found')
@@ -54,4 +61,49 @@ export const rotateToken = async (user, decoded) => {
   }
 
   return createLoginTokens(user)
+}
+
+export const verifyGoogleAccount = async (idToken) => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: GOOGLE_CLIENT_ID
+  })
+
+  return ticket.getPayload()
+}
+
+export const loginWithGmail = async (data) => {
+  const payload = await verifyGoogleAccount(data.idToken)
+  const {
+    email,
+    email_verified: emailVerified,
+    name,
+    picture
+  } = payload ?? {}
+
+  if (!email || emailVerified !== true) {
+    unauthorizedException('Email not verified')
+  }
+
+  let status = 200
+  let user = await userRepo.findOne({ filter: { email } })
+
+  if (!user) {
+    const [firstName, ...lastNameParts] = String(name ?? email).trim().split(/\s+/)
+    const lastName = lastNameParts.join(' ') || firstName
+
+    user = await userRepo.create({
+      data: {
+        email,
+        firstName,
+        lastName,
+        image: picture,
+        provider: providerEnum.google
+      }
+    })
+    status = 201
+  }
+
+  const tokens = createLoginTokens(user)
+  return { tokens, status }
 }

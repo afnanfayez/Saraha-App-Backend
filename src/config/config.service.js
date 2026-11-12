@@ -18,3 +18,8 @@ export const REFRESH_ADMIN_SECRET = process.env.JWT_REFRESH_ADMIN_SECRET
 
 export const ACCESS_EXPIRATION = Number(process.env.JWT_ACCESS_EXPIRATION)
 export const REFRESH_EXPIRATION = Number(process.env.JWT_REFRESH_EXPIRATION)
+
+export const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID ?? '')
+  .split(',')
+  .map((clientId) => clientId.trim())
+  .filter(Boolean)

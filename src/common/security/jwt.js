@@ -51,7 +51,8 @@ export const verifyToken = ({
   tokenType = tokenTypeEnum.access
 }) => {
   const decoded = jwt.decode(token)
-  const role = decoded.aud[0]
+  const audience = Array.isArray(decoded?.aud) ? decoded.aud[0] : decoded?.aud
+  const role = Number(audience)
   const secret = getSecret(tokenType, role)
 
   return jwt.verify(token, secret)
@@ -63,7 +64,7 @@ export const createLoginTokens = (user) => {
     secret: getSecret(tokenTypeEnum.access, user.role),
     options: {
       subject: user.id,
-      audience: [user.role],
+      audience: [String(user.role)],
       expiresIn: ACCESS_EXPIRATION
     }
   })
@@ -73,7 +74,7 @@ export const createLoginTokens = (user) => {
     secret: getSecret(tokenTypeEnum.refresh, user.role),
     options: {
       subject: user.id,
-      audience: [user.role],
+      audience: [String(user.role)],
       expiresIn: REFRESH_EXPIRATION
     }
   })

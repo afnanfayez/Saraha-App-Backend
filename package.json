@@ -15,6 +15,9 @@
     "dotenv": "latest",
     "express": "^5",
     "jsonwebtoken": "latest",
-    "mongoose": "latest"
+    "mongoose": "latest",
+    "zod": "latest",
+    "cors": "latest",
+    "google-auth-library": "latest"
   }
 }

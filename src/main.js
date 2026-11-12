@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import { port } from './config/config.service.js'
 import { dbConnect } from './database/connection.js'
 import { authController } from './modules/auth/index.js'
@@ -8,6 +9,7 @@ import { globalErrorHandler } from './common/middleware/error-handler.js'
 const bootstrap = async () => {
   const app = express()
 
+  app.use(cors())
   app.use(express.json())
 
   await dbConnect()

@@ -1,26 +1,27 @@
 # saraha_app
 
-Backend REST API for Saraha, built with Node.js, Express, MongoDB, and Mongoose.
+Node.js / Express / MongoDB backend for the Saraha App project.
 
-Supports user signup and login, bcrypt password hashing, AES-256-CBC phone encryption, JWT access/refresh tokens, and role-based profile access (user/admin).
+## Setup and startup
 
-## Run locally
+1. Run `npm install`.
+2. Copy `.env.example` to `.env.development` and `.env.production`, then set the MongoDB URI and application secrets.
+3. Run MongoDB locally or provide a reachable MongoDB URI in `DB_URI`.
+4. Replace the Google Client ID placeholder with your real OAuth Web Client ID.
+5. Run `npm run start:dev` for development or `npm run start:prod` for production.
 
-1. Install Node.js and start MongoDB on `127.0.0.1:27017`.
-2. Install dependencies: `npm install`
-3. Start the development server: `npm run start:dev`
+## Routes
 
-Production command: `npm run start:prod`
-
-## API endpoints
-
-| Method | Endpoint | Purpose |
+| Method | Route | Purpose |
 |---|---|---|
 | GET | `/` | Health check |
-| POST | `/auth/signup` | Create account |
-| POST | `/auth/login` | Sign in and receive tokens |
-| POST | `/auth/rotate-token` | Rotate tokens using a refresh token |
+| POST | `/auth/signup` | Register an account |
+| POST | `/auth/login` | Login with email and password |
+| POST | `/auth/login-with-gmail` | Google signup/login with `idToken` |
+| POST | `/auth/rotate-token` | Rotate access and refresh tokens |
 | GET | `/user/profile` | Authenticated user profile |
-| GET | `/user/admin-profile` | Admin-only profile |
+| GET | `/user/admin-profile` | Admin role only |
 
-Protected routes expect the token directly in the `authorization` header, without `Bearer`.
+`/auth/signup` requires `email`, `password`, `confirmPassword`, `username`, an E.164 `phone`, and numeric `gender`. Send a Google ID token as `{ "idToken": "..." }` to `/auth/login-with-gmail`.
+
+Protected routes accept `Authorization: Bearer <accessToken>` or `Authorization: Basic <base64(email:password)>`. Use the refresh token with the Bearer scheme for `/auth/rotate-token` after the access token expires.
