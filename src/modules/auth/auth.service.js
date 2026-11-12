@@ -36,7 +36,7 @@ export const signup = async (data) => {
 export const login = async (data) => {
   const user = await userRepo.findOne({ filter: { email: data.email } })
 
-  if (!user) {
+  if (!user?.password) {
     notFoundException('User not found')
   }
 
