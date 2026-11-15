@@ -9,7 +9,7 @@ import { tokenTypeEnum } from '../../common/enums/token.enum.js'
 export const authController = Router()
 
 authController.post('/signup', validation(signupSchema), async (req, res) => {
-  const user = await signup(req.validated)
+  const user = await signup(req.validated.body)
 
   return successResponse({
     res,
@@ -20,7 +20,7 @@ authController.post('/signup', validation(signupSchema), async (req, res) => {
 })
 
 authController.post('/login', validation(loginSchema), async (req, res) => {
-  const tokens = await login(req.validated)
+  const tokens = await login(req.validated.body)
 
   return successResponse({
     res,
