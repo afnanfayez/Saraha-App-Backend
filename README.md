@@ -19,9 +19,12 @@ Node.js / Express / MongoDB backend for the Saraha App project.
 | POST | `/auth/login` | Login with email and password |
 | POST | `/auth/login-with-gmail` | Google signup/login with `idToken` |
 | POST | `/auth/rotate-token` | Rotate access and refresh tokens |
+| GET | `/user/user-profile/:userId` | Public profile for a user ID |
 | GET | `/user/profile` | Authenticated user profile |
 | GET | `/user/admin-profile` | Admin role only |
 
 `/auth/signup` requires `email`, `password`, `confirmPassword`, `username`, an E.164 `phone`, and numeric `gender`. Send a Google ID token as `{ "idToken": "..." }` to `/auth/login-with-gmail`.
 
 Protected routes accept `Authorization: Bearer <accessToken>` or `Authorization: Basic <base64(email:password)>`. Use the refresh token with the Bearer scheme for `/auth/rotate-token` after the access token expires.
+
+Send `Accept-Language: 0` for Arabic validation messages or `Accept-Language: 1` for English. English is the default. The public user profile excludes passwords and internal account metadata.
