@@ -64,10 +64,16 @@ export const rotateToken = async (user, decoded) => {
 }
 
 export const verifyGoogleAccount = async (idToken) => {
-  const ticket = await googleClient.verifyIdToken({
-    idToken,
-    audience: GOOGLE_CLIENT_ID
-  })
+  let ticket
+
+  try {
+    ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: GOOGLE_CLIENT_ID
+    })
+  } catch {
+    unauthorizedException('Invalid Google token')
+  }
 
   return ticket.getPayload()
 }
