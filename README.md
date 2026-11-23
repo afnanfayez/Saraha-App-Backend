@@ -16,10 +16,17 @@ Node.js / Express / MongoDB backend for the Saraha App project.
 |---|---|---|
 | GET | `/` | Health check |
 | POST | `/auth/signup` | Register an account |
+| POST | `/auth/confirm-email` | Confirm an email with an OTP |
+| POST | `/auth/resend-otp` | Resend a subject-specific OTP |
+| POST | `/auth/forgot-password` | Send a password-reset OTP |
+| POST | `/auth/verify-forget-password-otp` | Verify a password-reset OTP |
+| POST | `/auth/reset-password` | Reset a password |
 | POST | `/auth/login` | Login with email and password |
 | POST | `/auth/login-with-gmail` | Google signup/login with `idToken` |
 | POST | `/auth/rotate-token` | Rotate access and refresh tokens |
+| POST | `/auth/logout` | Log out this device or all sessions |
 | GET | `/user/user-profile/:userId` | Public profile for a user ID |
+| POST | `/user/:id` | Upload a user image (authenticated) |
 | GET | `/user/profile` | Authenticated user profile |
 | GET | `/user/admin-profile` | Admin role only |
 
