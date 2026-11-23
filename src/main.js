@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { port } from './config/config.service.js'
 import { dbConnect } from './database/connection.js'
+import { redisConnect } from './database/redis.connection.js'
 import { authController } from './modules/auth/index.js'
 import { userController } from './modules/user/index.js'
 import { globalErrorHandler } from './common/middleware/error-handler.js'
@@ -13,6 +14,7 @@ const bootstrap = async () => {
   app.use(express.json())
 
   await dbConnect()
+  await redisConnect()
 
   app.get('/', (req, res) => {
     return res.status(200).json({ message: "I'm alive" })

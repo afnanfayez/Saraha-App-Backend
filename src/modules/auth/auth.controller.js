@@ -1,6 +1,26 @@
 import { Router } from 'express'
-import { signup, login, rotateToken, loginWithGmail } from './auth.service.js'
-import { loginSchema, signupSchema } from './auth.validation.js'
+import {
+  signup,
+  login,
+  rotateToken,
+  loginWithGmail,
+  logout,
+  confirmEmail,
+  resendOtp,
+  forgotPassword,
+  verifyForgetPasswordOtp,
+  resetPassword
+} from './auth.service.js'
+import {
+  loginSchema,
+  signupSchema,
+  logoutSchema,
+  confirmEmailSchema,
+  resendOtpSchema,
+  forgotPasswordSchema,
+  verifyForgetPasswordOtpSchema,
+  resetPasswordSchema
+} from './auth.validation.js'
 import { successResponse } from '../../common/utils/response.js'
 import { auth } from '../../common/middleware/authentication.js'
 import { validation } from '../../common/middleware/validator.js'
@@ -18,6 +38,67 @@ authController.post('/signup', validation(signupSchema), async (req, res) => {
     data: user
   })
 })
+
+authController.post(
+  '/confirm-email',
+  validation(confirmEmailSchema),
+  async (req, res) => {
+    await confirmEmail(req.validated.body)
+
+    return successResponse({
+      res,
+      message: 'Email confirmed successfully'
+    })
+  }
+)
+
+authController.post('/resend-otp', validation(resendOtpSchema), async (req, res) => {
+  await resendOtp(req.validated.body)
+
+  return successResponse({
+    res,
+    message: 'OTP sent successfully'
+  })
+})
+
+authController.post(
+  '/forgot-password',
+  validation(forgotPasswordSchema),
+  async (req, res) => {
+    await forgotPassword(req.validated.body)
+
+    return successResponse({
+      res,
+      message: 'Password reset OTP sent successfully'
+    })
+  }
+)
+
+authController.post(
+  '/verify-forget-password-otp',
+  validation(verifyForgetPasswordOtpSchema),
+  async (req, res) => {
+    await verifyForgetPasswordOtp(req.validated.body)
+
+    return successResponse({
+      res,
+      message: 'OTP verified successfully'
+    })
+  }
+)
+
+authController.post(
+  '/reset-password',
+  validation(resetPasswordSchema),
+  async (req, res) => {
+    await resetPassword(req.validated.body)
+
+    return successResponse({
+      res,
+      message: 'Password reset successfully'
+    })
+  }
+)
 
 authController.post('/login', validation(loginSchema), async (req, res) => {
   const tokens = await login(req.validated.body)
@@ -49,6 +130,24 @@ authController.post(
     return successResponse({
       res,
       data: tokens
+    })
+  }
+)
+
+authController.post(
+  '/logout',
+  auth(tokenTypeEnum.refresh),
+  validation(logoutSchema),
+  async (req, res) => {
+    await logout({
+      user: req.user,
+      decoded: req.decoded,
+      action: req.validated.body.action
+    })
+
+    return successResponse({
+      res,
+      message: 'Logged out successfully'
     })
   }
 )

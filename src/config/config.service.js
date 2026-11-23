@@ -6,6 +6,9 @@ config({ path: envFilePath })
 
 export const port = Number(process.env.PORT)
 export const DB_URI = process.env.DB_URI
+export const REDIS_URI = process.env.REDIS_URI
+export const EMAIL_USER = process.env.EMAIL_USER
+export const EMAIL_PASS = process.env.EMAIL_PASS
 export const SALT_ROUND = Number(process.env.SALT_ROUND)
 export const ENC_KEY = process.env.ENC_KEY
 export const ENC_IV_LENGTH = Number(process.env.ENC_IV_LENGTH)
@@ -23,3 +26,4 @@ export const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID ?? '')
   .split(',')
   .map((clientId) => clientId.trim())
   .filter(Boolean)
+export const MAX_TRIALS = Number(process.env.MAX_TRIALS) || 5

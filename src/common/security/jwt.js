@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { randomUUID } from 'node:crypto'
 import {
   ACCESS_ADMIN_SECRET,
   ACCESS_EXPIRATION,
@@ -9,6 +10,12 @@ import {
 } from '../../config/config.service.js'
 import { roleEnum } from '../enums/role.enum.js'
 import { tokenTypeEnum } from '../enums/token.enum.js'
+import {
+  exists,
+  getRevokedTokenCacheKey
+} from '../services/cache.service.js'
+import { unauthorizedException } from '../utils/exceptions.js'
+import userRepo from '../../database/repo/user.repo.js'
 
 export const createToken = ({
   payload = {},
@@ -46,7 +53,7 @@ export const getSecret = (
   }
 }
 
-export const verifyToken = ({
+export const verifyToken = async ({
   token,
   tokenType = tokenTypeEnum.access
 }) => {
@@ -55,17 +62,53 @@ export const verifyToken = ({
   const role = Number(audience)
   const secret = getSecret(tokenType, role)
 
-  return jwt.verify(token, secret)
+  const verifiedPayload = jwt.verify(token, secret)
+
+  if (!verifiedPayload.sub || !verifiedPayload.jti || !verifiedPayload.exp) {
+    unauthorizedException('Invalid token')
+  }
+
+  const isRevoked = await exists({
+    key: getRevokedTokenCacheKey({
+      userId: verifiedPayload.sub,
+      jti: verifiedPayload.jti
+    })
+  })
+
+  if (isRevoked) {
+    unauthorizedException('Token revoked')
+  }
+
+  const user = await userRepo.findById({ id: verifiedPayload.sub })
+  if (!user) {
+    unauthorizedException('Invalid token')
+  }
+
+  const credentialsChangedAtSeconds = user.changeCredentialsAt
+    ? Math.floor(user.changeCredentialsAt.getTime() / 1000)
+    : null
+
+  if (
+    credentialsChangedAtSeconds !== null &&
+    verifiedPayload.iat < credentialsChangedAtSeconds
+  ) {
+    unauthorizedException('Token revoked')
+  }
+
+  return verifiedPayload
 }
 
 export const createLoginTokens = (user) => {
+  const jti = randomUUID()
+
   const accessToken = createToken({
     payload: {},
     secret: getSecret(tokenTypeEnum.access, user.role),
     options: {
       subject: user.id,
       audience: [String(user.role)],
-      expiresIn: ACCESS_EXPIRATION
+      expiresIn: ACCESS_EXPIRATION,
+      jwtid: jti
     }
   })
 
@@ -75,7 +118,8 @@ export const createLoginTokens = (user) => {
     options: {
       subject: user.id,
       audience: [String(user.role)],
-      expiresIn: REFRESH_EXPIRATION
+      expiresIn: REFRESH_EXPIRATION,
+      jwtid: jti
     }
   })
 

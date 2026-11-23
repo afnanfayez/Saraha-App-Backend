@@ -19,3 +19,6 @@ export const forbiddenException = (message) =>
 
 export const badRequestException = (message) =>
   applicationException({ message, cause: 400 })
+
+export const tooManyRequestsException = (message) =>
+  applicationException({ message, cause: 429 })

@@ -53,6 +53,12 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String
+    },
+    confirmEmail: {
+      type: Date
+    },
+    changeCredentialsAt: {
+      type: Date
     }
   },
   {

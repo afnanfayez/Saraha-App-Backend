@@ -3,7 +3,8 @@ import { authEnum } from '../enums/auth.enum.js'
 import { tokenTypeEnum } from '../enums/token.enum.js'
 import {
   badRequestException,
-  notFoundException
+  notFoundException,
+  unauthorizedException
 } from '../utils/exceptions.js'
 import { myCompare } from '../security/hash.js'
 import { verifyToken } from '../security/jwt.js'
@@ -25,8 +26,12 @@ export const auth = (
 
   switch (prefix) {
     case authEnum.bearer: {
-      const decoded = verifyToken({ token, tokenType })
+      const decoded = await verifyToken({ token, tokenType })
       const user = await userRepo.findById({ id: decoded.sub })
+      if (!user) {
+        unauthorizedException('Invalid token')
+      }
+
       req.user = user
       req.decoded = decoded
       break
