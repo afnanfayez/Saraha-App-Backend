@@ -7,3 +7,9 @@ export const userProfileSchema = (lang = langEnum.EN) => z.object({
     userId: gf.id(lang)
   })
 })
+
+export const userUploadSchema = (lang = langEnum.EN) => z.object({
+  params: z.strictObject({
+    id: gf.id(lang)
+  })
+})
