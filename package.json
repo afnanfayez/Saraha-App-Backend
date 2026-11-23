@@ -11,13 +11,17 @@
   "dependencies": {
     "argon2": "latest",
     "bcrypt": "latest",
+    "cors": "latest",
     "cross-env": "latest",
     "dotenv": "latest",
     "express": "^5",
+    "file-type": "^22.3.0",
+    "google-auth-library": "latest",
     "jsonwebtoken": "latest",
     "mongoose": "latest",
-    "zod": "latest",
-    "cors": "latest",
-    "google-auth-library": "latest"
+    "multer": "^2.5.0",
+    "nodemailer": "^10.6.0",
+    "redis": "^6.3.1",
+    "zod": "latest"
   }
 }
